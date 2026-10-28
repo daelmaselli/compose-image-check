@@ -29,14 +29,14 @@ The remote executable is **not** installed on remote hosts. The local script is 
 Check one host:
 
 ```sh
-python3 compose-image-check.py --ssh root@uongo
+python3 compose-image-check.py --ssh user@host.example
 ```
 
 Check several hosts in sequence:
 
 ```sh
 python3 compose-image-check.py \
-  --ssh root@ccmg4 --ssh root@uongo --ssh root@sws4 --ssh root@xmaselli
+  --ssh user@host1.example --ssh user@host2.example --ssh user@host3.example
 ```
 
 When more than one SSH host is specified, each report has a host heading. If a host fails, the tool prints an error and **continues** with the remaining hosts; exit status is nonzero if at least one failed. Without `--ssh`, the scan runs locally.
@@ -46,9 +46,9 @@ When more than one SSH host is specified, each report has a host heading. If a h
 By default, output contains **only the results table**, omitting rows classified as `OK` or `PINNED`. It does not include progress, summary, notes, or registry counters.
 
 ```text
-STATO        PROGETTO/SERVIZIO   IMMAGINE / BASE   SPIEGAZIONE
+STATUS       PROJECT/SERVICE     IMAGE / BASE     EXPLANATION
 ...
-PULL         immich/server       example:tag      layer remoti diversi...
+PULL         example/app         example:tag      remote layers differ...
 ```
 
 - `--verbose` / `-v`: append summary, explanatory notes and registry counters.
@@ -65,7 +65,7 @@ PULL         immich/server       example:tag      layer remoti diversi...
 Example:
 
 ```sh
-python3 compose-image-check.py --ssh root@uongo --ssh root@ccmg4 --verbose --details
+python3 compose-image-check.py --ssh user@host1.example --ssh user@host2.example --verbose --details
 ```
 
 ## Status meanings
@@ -77,7 +77,7 @@ python3 compose-image-check.py --ssh root@uongo --ssh root@ccmg4 --verbose --det
 | `RECREATE` | Locally tagged/built image ID differs from the image ID used by the existing container. |
 | `OK` | The comparison performed found no difference. This is **not** vulnerability scanning. |
 | `PINNED` | Reference is fixed by digest and the tool does not track tag movement. |
-| `VERIFICARE` | A reliable determination could not be made; check the explanation. |
+| `CHECK` | A reliable determination could not be made; check the explanation. |
 
 The tool compares OCI `rootfs.diff_ids` rather than complete image identities, so metadata-only changes can be missed. For build services, multistage builds, `ARG`-derived bases and build tooling can limit certainty. The tool may use cached metadata (default six hours), which is marked in the explanation; a result with cached data is **not** a live registry verification.
 

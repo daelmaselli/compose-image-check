@@ -21,8 +21,8 @@ class CLIBehavior(unittest.TestCase):
         checker.results.clear()
         checker.metrics.clear()
         checker.VERBOSE = False
-        checker.row('PULL', 'example/app', 'alpine:latest', 'registry diverso', 'docker compose pull app')
-        checker.row('OK', 'example/db', 'postgres:17', 'allineato')
+        checker.row('PULL', 'example/app', 'alpine:latest', 'registry differs', 'docker compose pull app')
+        checker.row('OK', 'example/db', 'postgres:17', 'aligned')
 
     def test_default_report_is_only_table(self):
         output = StringIO()
@@ -30,9 +30,9 @@ class CLIBehavior(unittest.TestCase):
             checker.print_report(False)
         result = output.getvalue()
         self.assertIn('PULL', result)
-        self.assertNotIn('AVANZAMENTO', result)
-        self.assertNotIn('RIEPILOGO', result)
-        self.assertNotIn('NOTA:', result)
+        self.assertNotIn('PROGRESS', result)
+        self.assertNotIn('SUMMARY', result)
+        self.assertNotIn('NOTE:', result)
         self.assertNotIn('REGISTRY:', result)
         self.assertNotIn('example/db', result)
 
@@ -42,8 +42,8 @@ class CLIBehavior(unittest.TestCase):
         with redirect_stdout(output):
             checker.print_report(True)
         result = output.getvalue()
-        self.assertIn('RIEPILOGO:', result)
-        self.assertIn('NOTA:', result)
+        self.assertIn('SUMMARY:', result)
+        self.assertIn('NOTE:', result)
         self.assertIn('REGISTRY:', result)
         self.assertIn('example/db', result)
 
@@ -55,7 +55,7 @@ class CLIBehavior(unittest.TestCase):
                 'case " $* " in\n' +
                 '  *" root@bad "*) echo "remote unavailable" >&2; exit 9;;\n' +
                 'esac\n' +
-                'echo "STATO test-result"\n', encoding='utf-8')
+                'echo "STATUS test-result"\n', encoding='utf-8')
             fake_ssh.chmod(0o755)
             env = os.environ.copy()
             env['PATH'] = temp + os.pathsep + env.get('PATH', '')
@@ -65,7 +65,7 @@ class CLIBehavior(unittest.TestCase):
             self.assertIn('=== root@good ===', proc.stdout)
             self.assertIn('=== root@bad ===', proc.stdout)
             self.assertIn('=== root@last ===', proc.stdout)
-            self.assertEqual(proc.stdout.count('STATO test-result'), 2)
+            self.assertEqual(proc.stdout.count('STATUS test-result'), 2)
             self.assertIn('root@bad', proc.stderr)
 
 
