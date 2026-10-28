@@ -615,26 +615,29 @@ def print_report(show_ok, details=False):
     print('STATUS       PROJECT/SERVICE                            IMAGE / BASE                                 EXPLANATION')
     print('-' * 159)
     visible = 0
+    actions = []
     for status, name, ref, msg, action in results:
         if status in ('OK', 'PINNED') and not show_ok:
             continue
         visible += 1
         print(f'{status:<12} {name:<42} {ref:<44} {msg}')
         if details and action:
-            print(' ' * 12 + '  ACTION: ' + action)
+            actions.append(action)
     if not visible:
         print('No action required (use --show-ok to see all checks).')
     from collections import Counter
     counts = Counter(r[0] for r in results)
-    if not VERBOSE:
-        return
-    print('\nSUMMARY: ' + ' | '.join(f'{status}: {counts[status]}' for status in
-                                   ('PULL', 'BUILD?', 'RECREATE', 'CHECK', 'OK', 'PINNED') if counts[status]))
-    print('NOTE: BUILD? = remote base differs from the build; this is a hint, not proof of the digest used.')
-    print('      PULL = remote layers differ from the local tag; RECREATE = container uses a previous image ID.')
-    print('      --details shows suggested commands; layer cache lasts 6h (including migrated v1 cache).')
-    print('      HEAD/Buildx are logical operations: Buildx may generate multiple HTTP requests.')
-    print('REGISTRY: ' + ' | '.join(f'{k}={metrics[k]}' for k in ('cache_hit', 'head', 'head_unchanged', 'buildx')))
+    if VERBOSE:
+        print('\nSUMMARY: ' + ' | '.join(f'{status}: {counts[status]}' for status in
+                                       ('PULL', 'BUILD?', 'RECREATE', 'CHECK', 'OK', 'PINNED') if counts[status]))
+        print('NOTE: BUILD? = remote base differs from the build; this is a hint, not proof of the digest used.')
+        print('      PULL = remote layers differ from the local tag; RECREATE = container uses a previous image ID.')
+        print('      --details shows suggested commands at the end of the report; layer cache lasts 6h (including migrated v1 cache).')
+        print('      HEAD/Buildx are logical operations: Buildx may generate multiple HTTP requests.')
+        print('REGISTRY: ' + ' | '.join(f'{k}={metrics[k]}' for k in ('cache_hit', 'head', 'head_unchanged', 'buildx')))
+    if actions:
+        print('\nSUGGESTED COMMANDS (review before running):')
+        print('\n'.join(actions))
 
 
 

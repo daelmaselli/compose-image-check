@@ -47,6 +47,22 @@ class CLIBehavior(unittest.TestCase):
         self.assertIn('REGISTRY:', result)
         self.assertIn('example/db', result)
 
+    def test_details_are_grouped_at_end_after_verbose_report(self):
+        checker.VERBOSE = True
+        output = StringIO()
+        with redirect_stdout(output):
+            checker.print_report(False, details=True)
+        result = output.getvalue()
+        table_end = result.index('registry differs')
+        summary = result.index('SUMMARY:')
+        actions = result.index('SUGGESTED COMMANDS (review before running):')
+        command = result.index('docker compose pull app')
+        self.assertLess(table_end, summary)
+        self.assertLess(summary, actions)
+        self.assertLess(actions, command)
+        self.assertEqual(result.count('docker compose pull app'), 1)
+        self.assertTrue(result.rstrip().endswith('docker compose pull app'))
+
     def test_multiple_ssh_and_failure_does_not_stop_next(self):
         with tempfile.TemporaryDirectory() as temp:
             fake_ssh = Path(temp) / 'ssh'

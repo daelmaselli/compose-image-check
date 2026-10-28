@@ -56,7 +56,7 @@ PULL         example/app         example:tag      remote layers differ...
 - `--progress`: show per-service progress on stderr; including when using SSH.
 - `--no-progress`: explicitly disable progress (even when `--debug` is specified).
 - `--show-ok`: also list `OK` and `PINNED` services.
-- `--details`: print suggested Compose commands **without executing them**.
+- `--details`: print suggested Compose commands **without executing them**, grouped at the end of the report for easier copying.
 - `--all`: include stopped Compose projects where discoverable.
 - `--no-cache`: request fresh registry metadata (may increase rate limits).
 - `--hub-interval SEC`: minimum delay between Docker Hub operations **started by the script** (default 8 s).
